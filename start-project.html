@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Start a Project | UROOJ FATIMA</title>
+    <link rel="stylesheet" href="/src/style.css">
+</head>
+
+<body class="form-page">
+    <div class="bg-glow">
+        <div class="glow-1"></div>
+    </div>
+
+    <nav class="pill-nav">
+        <div class="nav-container">
+            <a href="/" class="btn btn-connect"
+                style="background: transparent; color: var(--text-primary); border: 1px solid var(--glass-border);">&lt;
+                BACK HOME</a>
+            <div class="logo">UROOJ FATIMA</div>
+            <a href="https://www.linkedin.com/in/urooj-fatima-b2698431a/" target="_blank" class="btn btn-connect">Chat
+                Now</a>
+        </div>
+    </nav>
+
+    <section class="form-section">
+        <div class="form-container">
+            <div class="form-header">
+                <span class="box-tag">Project Inquiry</span>
+                <h1>Get In<br>Touch </h1>
+                <p>Your ideas deserve intelligent execution. Let's discuss how we can build something impactful
+                    together.</p>
+
+                <div class="direct-contact">
+                    <p>Direct Contact:</p>
+                    <a href="mailto:uroojf199@gmail.com">uroojf199@gmail.com</a>
+                </div>
+            </div>
+
+            <div class="main-form">
+                <form action="https://api.web3forms.com/submit" method="POST" id="project-form">
+                    <!-- This is your free access key from Web3Forms -->
+                    <input type="hidden" name="access_key" value="9076f2e0-3235-4730-8035-6547754bd892">
+
+                    <div class="input-grid">
+                        <div class="input-group">
+                            <label>Full Name</label>
+                            <input type="text" name="name" placeholder="Name" required>
+                        </div>
+                        <div class="input-group">
+                            <label>Email Address</label>
+                            <input type="email" name="email" placeholder="email@example.com" required>
+                        </div>
+                    </div>
+
+                    <div class="input-group">
+                        <label>What's your goal?</label>
+                        <select name="service" required>
+                            <option value="" disabled selected>Select a service</option>
+                            <option value="ai-agents">Full stack AI Agents </option>
+                            <option value="n8n">n8n Workflow Automation</option>
+                            <option value="mvp">Quick MVP </option>
+                            <option value="other">Other AI Solutions</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label>Project Details</label>
+                        <textarea name="message" placeholder="Describe your project, challenges, or vision..."
+                            rows="5"></textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-main" id="submit-btn">
+                        <span>Send message</span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                    <p id="form-status"
+                        style="margin-top: 1.5rem; text-align: center; font-weight: 600; display: none;"></p>
+                </form>
+            </div>
+
+            <script>
+                const form = document.getElementById('project-form');
+                const status = document.getElementById('form-status');
+                const btn = document.getElementById('submit-btn');
+
+                form.addEventListener('submit', function (e) {
+                    e.preventDefault();
+                    btn.disabled = true;
+                    btn.querySelector('span').textContent = 'Sending...';
+
+                    const formData = new FormData(form);
+                    const object = Object.fromEntries(formData);
+                    const json = JSON.stringify(object);
+
+                    status.style.display = 'block';
+                    status.style.color = 'var(--secondary-color)';
+                    status.textContent = "Processing...";
+
+                    fetch('https://api.web3forms.com/submit', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        },
+                        body: json
+                    })
+                        .then(async (response) => {
+                            let json = await response.json();
+                            if (response.status == 200) {
+                                status.style.color = '#4ADE80';
+                                status.textContent = "Message sent successfully! I'll be in touch soon.";
+                                btn.querySelector('span').textContent = 'Success!';
+                                form.reset();
+                            } else {
+                                console.log(response);
+                                status.style.color = '#FF4B4B';
+                                status.textContent = json.message;
+                                btn.disabled = false;
+                                btn.querySelector('span').textContent = 'Send message';
+                            }
+                        })
+                        .catch(error => {
+                            console.log(error);
+                            status.style.color = '#FF4B4B';
+                            status.textContent = "Something went wrong. Please try again later.";
+                            btn.disabled = false;
+                            btn.querySelector('span').textContent = 'Send message';
+                        });
+                });
+            </script>
+        </div>
+    </section>
+
+    <style>
+        .form-page {
+            background: var(--bg-color);
+            overflow-y: auto;
+        }
+
+        .form-section {
+            padding: 180px 10% 100px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .form-container {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 5rem;
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        .form-header h1 {
+            font-size: 5rem;
+            line-height: 1;
+            margin-bottom: 2rem;
+            color: var(--text-primary);
+        }
+
+        .form-header p {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            margin-bottom: 3rem;
+            max-width: 400px;
+        }
+
+        .direct-contact p {
+            margin-bottom: 0.5rem;
+            opacity: 0.6;
+        }
+
+        .direct-contact a {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .main-form {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 4rem;
+            border-radius: 40px;
+            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .input-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .input-group {
+            margin-bottom: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .input-group label {
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+        }
+
+        .input-group input,
+        .input-group select,
+        .input-group textarea {
+            padding: 1.2rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 1rem;
+            color: var(--text-primary);
+            transition: var(--transition);
+        }
+
+        .input-group input:focus,
+        .input-group select:focus,
+        .input-group textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 0 0 4px var(--primary-glow);
+        }
+
+        .form-section .btn-main {
+            width: 100%;
+            justify-content: center;
+            margin-top: 1rem;
+        }
+
+        @media (max-width: 1024px) {
+            .form-container {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+            }
+
+            .form-header h1 {
+                font-size: 3.5rem;
+            }
+
+            .main-form {
+                padding: 2.5rem;
+            }
+        }
+    </style>
+</body>
+
+</html>

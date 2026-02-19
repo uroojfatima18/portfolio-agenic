@@ -60,6 +60,7 @@
   --primary-glow: rgba(124, 58, 237, 0.25);
   --secondary-color: #A78BFA; /* Lavender */
   --accent-color: #9448ec; /* Pink */
+  --accent-cyan: #00f2fe; /* New Complementary Cyan */
   --text-primary: #FAFAFA;
   --text-secondary: #A1A1AA;
   --font-heading: 'Outfit', sans-serif;
@@ -1062,10 +1063,10 @@ section {
   to { transform: translateY(-10px); }
 }
 
-#bubble-1 { top: 15%; left: 10%; animation-delay: 0s; }
-#bubble-2 { top: 40%; right: 15%; animation-delay: -1.2s; }
-#bubble-3 { bottom: 40%; left: 20%; animation-delay: -2.4s; }
-#bubble-4 { bottom: 10%; right: 10%; animation-delay: -3.6s; }
+#bubble-1 { top: 15%; left: 10%; animation-delay: 0s; border-color: var(--primary-color); }
+#bubble-2 { top: 40%; right: 15%; animation-delay: -1.2s; border-color: var(--accent-cyan); }
+#bubble-3 { bottom: 40%; left: 20%; animation-delay: -2.4s; border-color: var(--accent-cyan); }
+#bubble-4 { bottom: 10%; right: 10%; animation-delay: -3.6s; border-color: var(--primary-color); }
 
 .mock-cursor {
   position: absolute;
@@ -1330,7 +1331,7 @@ section {
 }
 
 .copyright {
-  background: linear-gradient(to right, #FAFAFA, var(--secondary-color));
+  background: linear-gradient(to right, #FAFAFA, var(--secondary-color), var(--accent-cyan));
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;

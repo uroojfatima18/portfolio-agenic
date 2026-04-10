@@ -4,267 +4,148 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Start a Project | UROOJ FATIMA</title>
-    <link rel="stylesheet" href="/src/style.css">
+    <title>Initiate Mission | UROOJ FATIMA</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;500;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <style>
+        body { background-color: #050505; color: #e5e2e1; }
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); border: 1px solid rgba(255, 255, 255, 0.08); }
+        .input-focus:focus { border-color: #22d3ee; box-shadow: 0 0 15px rgba(34, 211, 238, 0.2); }
+    </style>
 </head>
 
-<body class="form-page">
-    <div class="bg-glow">
-        <div class="glow-1"></div>
+<body class="font-[Manrope] selection:bg-cyan-500/30">
+    <!-- Cyber Background grid -->
+    <div class="fixed inset-0 z-0 pointer-events-none">
+        <div class="absolute inset-0 bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] bg-[size:40px_40px]"></div>
+        <div class="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-cyan-500/5 blur-[120px] rounded-full"></div>
     </div>
 
-    <nav class="pill-nav">
-        <div class="nav-container">
-            <a href="/" class="btn btn-connect"
-                style="background: transparent; color: var(--text-primary); border: 1px solid var(--glass-border);">&lt;
-                BACK HOME</a>
-            <div class="logo">UROOJ FATIMA</div>
-            <a href="https://www.linkedin.com/in/urooj-fatima-b2698431a/" target="_blank" class="btn btn-connect">Chat
-                Now</a>
-        </div>
-    </nav>
+    <div class="relative z-10 min-h-screen flex flex-col">
+        <!-- Minimal Nav -->
+        <header class="p-8 flex justify-between items-center max-w-7xl mx-auto w-full">
+            <a href="/" class="flex items-center gap-2 text-zinc-500 hover:text-white transition-colors group">
+                <span class="material-symbols-outlined text-sm group-hover:-translate-x-1 transition-transform">arrow_back</span>
+                <span class="font-mono text-[10px] uppercase tracking-widest">Return_to_Station</span>
+            </a>
+            <div class="font-[Outfit] text-xl font-black text-white">&lt;UROOJ/&gt;</div>
+        </header>
 
-    <section class="form-section">
-        <div class="form-container">
-            <div class="form-header">
-                <span class="box-tag">Project Inquiry</span>
-                <h1>Get In<br>Touch </h1>
-                <p>Your ideas deserve intelligent execution. Let's discuss how we can build something impactful
-                    together.</p>
+        <main class="flex-grow flex items-center justify-center p-6">
+            <div class="max-w-4xl w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <!-- Content -->
+                <div class="space-y-8">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-400/10 border border-cyan-400/20">
+                        <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
+                        <span class="text-[10px] font-mono text-cyan-400 uppercase tracking-widest">Protocol: Mission_Briefing</span>
+                    </div>
+                    <h1 class="text-6xl font-[Outfit] font-black text-white leading-[0.9] tracking-tighter">
+                        Initiate <br> <span class="text-cyan-400">Mission</span>
+                    </h1>
+                    <p class="text-zinc-500 text-sm leading-relaxed max-w-sm">
+                        Ready to automate your logic? Fill out the parameters below to initialize collaboration.
+                    </p>
+                    <div class="pt-6 border-t border-white/5 space-y-4">
+                        <div class="flex items-center gap-4 text-xs font-mono text-zinc-500 hover:text-cyan-400 transition-colors cursor-default">
+                            <span class="material-symbols-outlined text-sm">mail</span>
+                            <span>uroojf199@gmail.com</span>
+                        </div>
+                    </div>
+                </div>
 
-                <div class="direct-contact">
-                    <p>Direct Contact:</p>
-                    <a href="mailto:uroof199@gmail.com">uroof199@gmail.com</a>
+                <!-- Form -->
+                <div class="glass p-8 rounded-3xl shadow-2xl space-y-6">
+                    <form action="https://api.web3forms.com/submit" method="POST" id="project-form" class="space-y-4">
+                        <input type="hidden" name="access_key" value="9076f2e0-3235-4730-8035-6547754bd892">
+                        
+                        <div class="space-y-2">
+                            <label class="font-mono text-[10px] uppercase text-zinc-500 tracking-widest">Client Name</label>
+                            <input type="text" name="name" required placeholder="IDENTIFY_SELF" 
+                                class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-zinc-700 outline-none transition-all focus:border-cyan-400/50 focus:ring-1 focus:ring-cyan-400/20">
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="font-mono text-[10px] uppercase text-zinc-500 tracking-widest">Comms Interface</label>
+                            <input type="email" name="email" required placeholder="EMAIL_ADDRESS" 
+                                class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-zinc-700 outline-none transition-all focus:border-cyan-400/50 focus:ring-1 focus:ring-cyan-400/20">
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="font-mono text-[10px] uppercase text-zinc-500 tracking-widest">Mission Parameters</label>
+                            <select name="service" required 
+                                class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white outline-none transition-all focus:border-cyan-400/50 focus:ring-1 focus:ring-cyan-400/20 appearance-none">
+                                <option value="ai-agents">Autonomous AI Agents</option>
+                                <option value="n8n">n8n Workflow Automation</option>
+                                <option value="mvp">Rapid AI MVP</option>
+                                <option value="other">Other Synthetic Solutions</option>
+                            </select>
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="font-mono text-[10px] uppercase text-zinc-500 tracking-widest">Briefing Details</label>
+                            <textarea name="message" rows="4" placeholder="DESCRIBE_PROJECT_LOGIC..." 
+                                class="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white placeholder:text-zinc-700 outline-none transition-all focus:border-cyan-400/50 focus:ring-1 focus:ring-cyan-400/20"></textarea>
+                        </div>
+
+                        <button type="submit" id="submit-btn" class="w-full py-4 bg-cyan-400 text-black font-black font-[Outfit] rounded-xl hover:bg-white transition-all uppercase text-xs tracking-[0.2em] shadow-[0_10px_30px_-10px_rgba(34,211,238,0.4)]">
+                            Submit Protocol
+                        </button>
+                        <p id="form-status" class="text-[10px] font-mono text-center mt-4 uppercase tracking-widest hidden"></p>
+                    </form>
                 </div>
             </div>
+        </main>
 
-            <div class="main-form">
-                <form action="https://api.web3forms.com/submit" method="POST" id="project-form">
-                    <!-- This is your free access key from Web3Forms -->
-                    <input type="hidden" name="access_key" value="9076f2e0-3235-4730-8035-6547754bd892">
+        <footer class="p-8 text-center">
+            <p class="font-mono text-[8px] text-zinc-700 uppercase tracking-[0.4em]">© 2026 UROOJ FATIMA // SYSTEMS_READY</p>
+        </footer>
+    </div>
 
-                    <div class="input-grid">
-                        <div class="input-group">
-                            <label>Full Name</label>
-                            <input type="text" name="name" placeholder="Name" required>
-                        </div>
-                        <div class="input-group">
-                            <label>Email Address</label>
-                            <input type="email" name="email" placeholder="email@example.com" required>
-                        </div>
-                    </div>
+    <script>
+        const form = document.getElementById('project-form');
+        const status = document.getElementById('form-status');
+        const btn = document.getElementById('submit-btn');
 
-                    <div class="input-group">
-                        <label>What's your goal?</label>
-                        <select name="service" required>
-                            <option value="" disabled selected>Select a service</option>
-                            <option value="ai-agents">Full stack AI Agents </option>
-                            <option value="n8n">n8n Workflow Automation</option>
-                            <option value="mvp">Quick MVP </option>
-                            <option value="other">Other AI Solutions</option>
-                        </select>
-                    </div>
+        form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            btn.disabled = true;
+            btn.textContent = 'TRANSMITTING...';
 
-                    <div class="input-group">
-                        <label>Project Details</label>
-                        <textarea name="message" placeholder="Describe your project, challenges, or vision..."
-                            rows="5"></textarea>
-                    </div>
+            const formData = new FormData(form);
+            const object = Object.fromEntries(formData);
+            const json = JSON.stringify(object);
 
-                    <button type="submit" class="btn btn-main" id="submit-btn">
-                        <span>Send message</span>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <path d="M5 12h14M12 5l7 7-7 7" />
-                        </svg>
-                    </button>
-                    <p id="form-status"
-                        style="margin-top: 1.5rem; text-align: center; font-weight: 600; display: none;"></p>
-                </form>
-            </div>
+            status.classList.remove('hidden');
+            status.style.color = '#22d3ee';
+            status.textContent = "INITIALIZING_UPLOAD...";
 
-            <script>
-                const form = document.getElementById('project-form');
-                const status = document.getElementById('form-status');
-                const btn = document.getElementById('submit-btn');
-
-                form.addEventListener('submit', function (e) {
-                    e.preventDefault();
-                    btn.disabled = true;
-                    btn.querySelector('span').textContent = 'Sending...';
-
-                    const formData = new FormData(form);
-                    const object = Object.fromEntries(formData);
-                    const json = JSON.stringify(object);
-
-                    status.style.display = 'block';
-                    status.style.color = 'var(--secondary-color)';
-                    status.textContent = "Processing...";
-
-                    fetch('https://api.web3forms.com/submit', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Accept': 'application/json'
-                        },
-                        body: json
-                    })
-                        .then(async (response) => {
-                            let json = await response.json();
-                            if (response.status == 200) {
-                                status.style.color = '#4ADE80';
-                                status.textContent = "Message sent successfully! I'll be in touch soon.";
-                                btn.querySelector('span').textContent = 'Success!';
-                                form.reset();
-                            } else {
-                                console.log(response);
-                                status.style.color = '#FF4B4B';
-                                status.textContent = json.message;
-                                btn.disabled = false;
-                                btn.querySelector('span').textContent = 'Send message';
-                            }
-                        })
-                        .catch(error => {
-                            console.log(error);
-                            status.style.color = '#FF4B4B';
-                            status.textContent = "Something went wrong. Please try again later.";
-                            btn.disabled = false;
-                            btn.querySelector('span').textContent = 'Send message';
-                        });
-                });
-            </script>
-        </div>
-    </section>
-
-    <style>
-        .form-page {
-            background: var(--bg-color);
-            overflow-y: auto;
-        }
-
-        .form-section {
-            padding: 180px 10% 100px;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .form-container {
-            display: grid;
-            grid-template-columns: 1fr 1.2fr;
-            gap: 5rem;
-            max-width: 1200px;
-            width: 100%;
-        }
-
-        .form-header h1 {
-            font-size: 5rem;
-            line-height: 1;
-            margin-bottom: 2rem;
-            color: var(--text-primary);
-        }
-
-        .form-header p {
-            font-size: 1.2rem;
-            color: var(--text-secondary);
-            margin-bottom: 3rem;
-            max-width: 400px;
-        }
-
-        .direct-contact p {
-            margin-bottom: 0.5rem;
-            opacity: 0.6;
-        }
-
-        .direct-contact a {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: var(--primary-color);
-        }
-
-        .main-form {
-            background: rgba(255, 255, 255, 0.03);
-            padding: 4rem;
-            border-radius: 40px;
-            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .input-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .input-group {
-            margin-bottom: 2rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.8rem;
-        }
-
-        .input-group label {
-            font-weight: 700;
-            font-size: 0.9rem;
-            color: var(--text-primary);
-        }
-
-        .input-group input,
-        .input-group select,
-        .input-group textarea {
-            padding: 1.2rem;
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            font-family: inherit;
-            font-size: 1rem;
-            color: var(--text-primary);
-            transition: var(--transition);
-            appearance: none;
-            /* Reset for custom styling if needed */
-        }
-
-        /* Ensure dropdown options are visible and dark themed */
-        .input-group select option {
-            background-color: #111;
-            /* Dark background for options */
-            color: #fff;
-            /* White text for options */
-            padding: 10px;
-        }
-
-        .input-group input:focus,
-        .input-group select:focus,
-        .input-group textarea:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            background: rgba(255, 255, 255, 0.05);
-            box-shadow: 0 0 0 4px var(--primary-glow);
-        }
-
-        .form-section .btn-main {
-            width: 100%;
-            justify-content: center;
-            margin-top: 1rem;
-        }
-
-        @media (max-width: 1024px) {
-            .form-container {
-                grid-template-columns: 1fr;
-                gap: 3rem;
-            }
-
-            .form-header h1 {
-                font-size: 3.5rem;
-            }
-
-            .main-form {
-                padding: 2.5rem;
-            }
-        }
-    </style>
+            fetch('https://api.web3forms.com/submit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                body: json
+            })
+            .then(async (response) => {
+                let json = await response.json();
+                if (response.status == 200) {
+                    status.style.color = '#4ADE80';
+                    status.textContent = "TRANSMISSION_SUCCESSFUL // COMS_ESTABLISHED";
+                    btn.textContent = 'MISSION_LOCKED';
+                    form.reset();
+                } else {
+                    status.style.color = '#FF4B4B';
+                    status.textContent = "TRANSMISSION_ERROR: " + json.message;
+                    btn.disabled = false;
+                    btn.textContent = 'RETRY_SUBMISSION';
+                }
+            })
+            .catch(error => {
+                status.style.color = '#FF4B4B';
+                status.textContent = "SYSTEM_FAULT: TRY_DIRECT_MAIL";
+                btn.disabled = false;
+                btn.textContent = 'RETRY_SUBMISSION';
+            });
+        });
+    </script>
 </body>
-
-</html>
+</html>

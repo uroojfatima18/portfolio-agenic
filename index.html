@@ -12,29 +12,31 @@
   <style>
     .plasma-glow { box-shadow: 0 0 50px -10px rgba(34, 211, 238, 0.2); }
     .glass-panel { background: rgba(19, 19, 19, 0.7); backdrop-filter: blur(20px); }
-    body { background-color: #050505; color: #e5e2e1; zoom: 0.9; }
-    .section-title { font-family: 'Outfit', sans-serif; font-size: 3rem; font-weight: 900; color: #22d3ee; margin-bottom: 2rem; text-align: center; }
+    body { background-color: #050505; color: #e5e2e1; }
+    .section-title { font-family: 'Outfit', sans-serif; font-size: clamp(2rem, 8vw, 3.5rem); font-weight: 900; color: #22d3ee; margin-bottom: 2rem; text-align: center; line-height: 1.1; }
     
     /* Exact Original Scroll Indicator Styles */
+    /* Full-Page Scroll Progress Tracker */
     .scroll-indicator {
       position: fixed;
-      right: 2.5rem;
-      top: 0;
-      height: 100vh;
-      width: 2px;
-      z-index: 1000;
+      left: 0.25rem;
+      top: 1rem;
+      bottom: 1rem;
+      width: 1px;
+      z-index: 10;
       display: flex;
       flex-direction: column;
       align-items: center;
+      opacity: 0.4;
     }
     .indicator-line-bg {
       position: absolute;
       top: 0;
+      bottom: 0;
       left: 0;
-      width: 100%;
-      height: 100%;
+      right: 0;
       background: rgba(255, 255, 255, 0.05);
-      border-radius: 10px;
+      border-radius: 20px;
     }
     .indicator-line-progress {
       position: absolute;
@@ -42,22 +44,26 @@
       left: 0;
       width: 100%;
       height: 0%; 
-      background: linear-gradient(to bottom, #22d3ee, #8b5cf6);
-      border-radius: 10px;
-      transition: height 0.15s ease-out;
+      background: linear-gradient(to bottom, #22d3ee, #8b5cf6, #22d3ee);
+      background-size: 100% 200%;
+      animation: gradient-flow 4s linear infinite;
+      border-radius: 20px;
+      box-shadow: 0 0 10px rgba(34, 211, 238, 0.3);
     }
     .indicator-ball {
       position: absolute;
-      top: -8px; 
       left: 50%;
-      transform: translateX(-50%);
-      width: 16px;
-      height: 16px;
+      transform: translate(-50%, -50%);
+      width: 8px;
+      height: 8px;
       background: #fff;
       border-radius: 50%;
-      box-shadow: 0 0 10px #fff, 0 0 20px #22d3ee, 0 0 30px #8b5cf6;
-      z-index: 1001;
-      transition: top 0.1s linear; /* Fast response */
+      box-shadow: 0 0 10px #fff, 0 0 20px #22d3ee;
+      z-index: 11;
+      transition: top 0.1s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    @media (max-width: 1024px) {
+      .scroll-indicator { display: none; }
     }
     @keyframes scan {
       0%, 100% { transform: translateY(-100%); opacity: 0; }
@@ -106,7 +112,18 @@
     #cursor-dot, #cursor-ring { transform: translate(-50%, -50%); opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
     body:hover #cursor-dot, body:hover #cursor-ring { opacity: 1; }
     .cursor-hover #cursor-ring { width: 60px; height: 60px; background: rgba(34, 211, 238, 0.1); border-color: #22d3ee; }
-    .cursor-hover #cursor-dot { transform: translate(-50%, -50%) scale(3); opacity: 0.5; }
+    /* Profile Picture 3D Tilt Effect */
+    .profile-tilt {
+      transition: transform 0.2s cubic-bezier(0.23, 1, 0.32, 1);
+      transform-style: preserve-3d;
+    }
+    .profile-tilt:hover {
+      filter: brightness(1.1) grayscale(0);
+    }
+    
+    @media (min-width: 1024px) {
+      .page-gutter { padding-left: 4rem; }
+    }
   </style>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -136,7 +153,26 @@
       interactibles.forEach(el => {
         el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
         el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
-      });
+        // 3D Tilt Effect for Profile Image
+      const profile = document.querySelector('.profile-tilt');
+      if(profile) {
+        profile.addEventListener('mousemove', (e) => {
+          const rect = profile.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          const centerX = rect.width / 2;
+          const centerY = rect.height / 2;
+          const rotateX = (y - centerY) / 10;
+          const rotateY = (centerX - x) / 10;
+          
+          profile.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`;
+        });
+        
+        profile.addEventListener('mouseleave', () => {
+          profile.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale(1)`;
+        });
+      }
+    });
 
       const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
@@ -161,16 +197,18 @@
       const updateScroll = () => {
         if (!indicator || !ball || !container) return;
         
-        const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
-        const progress = (window.scrollY / totalHeight);
+        const winScroll = window.pageYOffset || document.documentElement.scrollTop;
+        const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const progress = height > 0 ? Math.min(Math.max(winScroll / height, 0), 1) : 0;
         
-        // Update line height
-        indicator.style.height = (progress * 100) + '%';
+        const trackHeight = container.offsetHeight;
+        const currentHeight = progress * trackHeight;
         
-        // Update ball position
-        const containerHeight = container.offsetHeight;
-        const ballPosition = progress * (containerHeight);
-        ball.style.top = (ballPosition - 8) + 'px';
+        indicator.style.height = `${currentHeight}px`;
+        ball.style.top = `${currentHeight}px`;
+        
+        // Hide/Show based on scroll
+        container.style.opacity = progress > 0.001 ? '1' : '0.4';
       };
 
       window.addEventListener('scroll', updateScroll);
@@ -199,13 +237,12 @@
     <header class="sticky top-6 z-50 flex justify-between items-center px-8 py-3 w-full bg-black/80 backdrop-blur-xl rounded-full max-w-5xl mx-auto border border-white/10 shadow-[0_0_40px_-10px_rgba(34,211,238,0.15)]">
       <div class="flex items-center gap-3">
         <span class="material-symbols-outlined text-cyan-400">terminal</span>
-        <span class="font-[Outfit] text-xl font-black text-cyan-400 tracking-tighter">&lt;UROOJ/&gt;</span>
+        <span class="font-[Outfit] text-xl font-black text-white tracking-tighter">&lt;UROOJ/&gt;</span>
       </div>
       <nav class="hidden md:flex items-center gap-8">
         <a class="text-cyan-400 font-bold border-b-2 border-cyan-400/50 pb-1 font-[Space_Grotesk]" href="#home">Home</a>
         <a class="text-zinc-400 font-medium hover:text-white transition-all duration-300 font-[Space_Grotesk]" href="#about">About</a>
         <a class="text-zinc-400 font-medium hover:text-white transition-all duration-300 font-[Space_Grotesk]" href="#projects">Projects</a>
-        <a class="text-zinc-400 font-medium hover:text-white transition-all duration-300 font-[Space_Grotesk]" href="#automation">Demo </a>
       </nav>
       <a href="https://mail.google.com/mail/?view=cm&fs=1&to=uroojf199@gmail.com" target="_blank" class="bg-cyan-400 text-black px-6 py-2 rounded-xl font-[Outfit] font-bold text-sm active:scale-95 transition-transform hover:shadow-[0_0_15px_rgba(34,211,238,0.4)]">
         Start Project Today
@@ -213,14 +250,14 @@
     </header>
 
     <!-- New Profile Hero Section -->
-    <main class="relative pt-32 pb-20 overflow-hidden" id="home">
+    <main class="relative pt-10 pb-2 overflow-hidden page-gutter" id="home">
       <div class="max-w-7xl mx-auto px-6">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          <div class="space-y-8 animate-fade-in order-2 lg:order-1">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+          <div class="space-y-4 animate-fade-in order-2 lg:order-1">
             <!-- New Prominent Main Tag -->
-            <div class="inline-flex items-center gap-3 px-5 py-2 rounded-xl bg-white/5 border border-cyan-400/30 shadow-[0_5px_15px_rgba(34,211,238,0.1)] mb-4">
-              <div class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></div>
-              <span class="font-[Outfit] text-xs uppercase tracking-[0.3em] font-black text-cyan-400">Agentic AI Developer</span>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-xl bg-white/5 border border-cyan-400/30 shadow-[0_5px_15px_rgba(34,211,238,0.1)] mb-0">
+              <div class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></div>
+              <span class="font-[Outfit] text-[10px] uppercase tracking-[0.3em] font-black text-cyan-400">Agentic AI Developer</span>
             </div>
             
             <h1 class="text-6xl md:text-8xl font-[Outfit] font-black text-white leading-[0.8] tracking-tighter">
@@ -229,27 +266,33 @@
               Systems
             </h1>
             
-            <div class="bg-white/5 p-8 rounded-3xl border border-white/10 space-y-6 backdrop-blur-xl">
-              <p class="text-zinc-400 text-lg font-light leading-relaxed">
-                I am <span class="text-white font-bold text-xl font-[Outfit]">Urooj Fatima</span>, an AI Architect crafting intelligent agents that automate complex workflows with precision.
-              </p>
+            <div class="bg-white/5 p-5 rounded-2xl border border-white/10 space-y-4 backdrop-blur-xl">
+              <div class="space-y-3">
+                <h2 class="text-white font-bold text-2xl font-[Outfit]">Hi I'm Urooj Fatima</h2>
+                <p class="text-zinc-300 text-sm font-light leading-relaxed">
+                  I build <span class="text-cyan-400 font-bold">AI agents</span> that handle the repetitive work your team keeps getting stuck doing so they can focus on what actually matters.
+                </p>
+                <p class="text-zinc-400 text-xs leading-relaxed border-t border-white/5 pt-4">
+                  I've built <span class="text-white font-bold">10+ projects</span> — AI Agents, RAG chatbots, voice agents, multi-agent pipelines, and automation workflows that save clients hours every single week.
+                </p>
+              </div>
               
-              <div class="flex items-center gap-8 pt-4 border-t border-white/5">
+              <div class="flex items-center gap-6 pt-3 border-t border-white/5">
                 <div class="flex flex-col">
-                  <span class="text-cyan-400 text-3xl font-black font-[Outfit]">1+</span>
-                  <span class="text-[10px] text-zinc-500 uppercase tracking-widest">Year Experience</span>
+                  <span class="text-cyan-400 text-2xl font-black font-[Outfit]">1+</span>
+                  <span class="text-[9px] text-zinc-500 uppercase tracking-widest">Year Exp</span>
                 </div>
-                <div class="w-px h-10 bg-white/10"></div>
+                <div class="w-px h-8 bg-white/10"></div>
                 <div class="flex flex-col">
-                  <span class="text-purple-400 text-3xl font-black font-[Outfit]">10+</span>
-                  <span class="text-[10px] text-zinc-500 uppercase tracking-widest">Projects Verified</span>
+                  <span class="text-purple-400 text-2xl font-black font-[Outfit]">10+</span>
+                  <span class="text-[9px] text-zinc-500 uppercase tracking-widest">Projects</span>
                 </div>
               </div>
             </div>
 
             <div class="flex flex-wrap gap-4">
-              <a href="https://mail.google.com/mail/?view=cm&fs=1&to=uroojf199@gmail.com" target="_blank" class="px-8 py-4 bg-white text-black font-black font-[Outfit] rounded-xl hover:bg-cyan-400 transition-all uppercase text-sm tracking-widest shadow-[0_10px_30px_-10px_rgba(255,255,255,0.3)]">
-                Start a Project
+              <a href="https://www.linkedin.com/in/urooj-fatima-b2698431a/" target="_blank" class="px-8 py-4 bg-white text-black font-black font-[Outfit] rounded-xl hover:bg-cyan-400 transition-all uppercase text-sm tracking-widest shadow-[0_10px_30px_-10px_rgba(255,255,255,0.3)]">
+                LinkedIn
               </a>
               <a href="#projects" class="px-8 py-4 border border-white/10 text-white font-bold font-[Outfit] rounded-xl hover:bg-white/5 transition-all uppercase text-sm tracking-widest">
               Projects
@@ -258,162 +301,212 @@
           </div>
 
           <!-- Profile Image Visual (Clean Version) -->
-          <div class="relative group order-1 lg:order-2 animate-reveal">
+          <div class="relative group order-1 lg:order-2 animate-reveal max-w-sm mx-auto">
             <div class="absolute -inset-1 bg-gradient-to-tr from-cyan-400 to-purple-500 rounded-[2.5rem] blur-xl opacity-20 group-hover:opacity-40 transition duration-1000"></div>
-            <div class="relative aspect-square rounded-[2rem] overflow-hidden border border-white/10 bg-zinc-900 group-hover:border-cyan-400/50 transition-all duration-700 shimmer">
+            <div class="relative aspect-square rounded-[2rem] overflow-hidden border border-white/10 bg-zinc-900 group-hover:border-cyan-400/50 transition-all duration-700 shimmer profile-tilt">
               <img src="/uroojfatima.png" alt="Urooj Fatima" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 scale-105 group-hover:scale-100 italic">
               <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60"></div>
-              
-              <div class="absolute bottom-6 left-6 flex items-center gap-3">
-                <span class="font-mono text-[9px] uppercase tracking-[0.3em] text-white"></span>
-              </div>
             </div>
           </div>
         </div>
       </div>
     </main>
 
-    <!-- Transition to Capability Matrix -->
-
+    <!-- Technical Proficiency Section -->
     <section class="skills py-24 bg-white/[0.02]" id="skills">
       <div class="max-w-7xl mx-auto px-6">
-        <h2 class="section-title">Skills & Expertise </h2>
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-          <!-- 1. Agentic -->
-          <div class="p-8 min-h-[220px] bg-white/5 border border-white/10 rounded-2xl hover:bg-cyan-400/5 transition-all group magnetic-card shimmer animate-reveal">
-            <span class="material-symbols-outlined text-cyan-400 text-4xl mb-6 group-hover:animate-pulse">hub</span>
-            <h4 class="text-white font-bold text-lg mb-3 font-[Outfit]">Agentic Systems</h4>
-            <p class="text-zinc-300 text-sm font-light tracking-wide">OpenAI-Agent-SDK, MCP, Multi-Agents</p>
+        <h2 class="section-title">Tech Stack</h2>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+          <!-- AI & Tools -->
+          <div class="p-6 bg-zinc-900/50 border border-white/10 rounded-2xl hover:border-cyan-400/50 transition-all duration-500 group magnetic-card animate-reveal stagger-1">
+            <div class="flex items-center gap-4 pb-4 mb-4 border-b border-white/10">
+              <span class="material-symbols-outlined text-cyan-400 text-2xl">psychology</span>
+              <h3 class="text-white font-[Outfit] text-lg font-bold">AI & Tools</h3>
+            </div>
+            <ul class="space-y-1.5 text-zinc-300 text-sm font-medium list-none">
+              <li>Claude Code</li>
+              <li>Vibe Coding</li>
+              <li>Spec-driven Dev</li>
+              <li>AI-native Dev</li>
+              <li>OpenAI / Gemini / OpenRouter</li>
+              <li>Postman / API Tools</li>
+            </ul>
           </div>
-          <!-- 2. n8n -->
-          <div class="p-8 min-h-[220px] bg-white/5 border border-white/10 rounded-2xl hover:bg-cyan-400/5 transition-all group magnetic-card shimmer animate-reveal">
-            <span class="material-symbols-outlined text-cyan-400 text-4xl mb-6 group-hover:animate-pulse">settings_input_component</span>
-            <h4 class="text-white font-bold text-lg mb-3 font-[Outfit]">Workflow Automation</h4>
-            <p class="text-zinc-300 text-sm font-light tracking-wide">n8n / Enterprise Automation</p>
-          </div>
-          <!-- 3. Chatbot -->
-          <div class="p-8 min-h-[220px] bg-white/5 border border-white/10 rounded-2xl hover:bg-cyan-400/5 transition-all group magnetic-card shimmer animate-reveal">
-            <span class="material-symbols-outlined text-cyan-400 text-4xl mb-6 group-hover:animate-pulse">chat</span>
-            <h4 class="text-white font-bold text-lg mb-3 font-[Outfit]">Chatbot Development</h4>
-            <p class="text-zinc-300 text-sm font-light tracking-wide">Function Calling, Custom Agents, API Integrations</p>
-          </div>
-          <!-- 4. Programming -->
-          <div class="p-8 min-h-[220px] bg-white/5 border border-white/10 rounded-2xl hover:bg-cyan-400/5 transition-all group magnetic-card shimmer animate-reveal">
-            <span class="material-symbols-outlined text-cyan-400 text-4xl mb-6 group-hover:animate-pulse">code</span>
-            <h4 class="text-white font-bold text-lg mb-3 font-[Outfit]">Programming Language</h4>
-            <p class="text-zinc-300 text-sm font-light tracking-wide">Python Specialist</p>
-          </div>
-          <!-- 5. RAG -->
-          <div class="p-8 min-h-[220px] bg-white/5 border border-white/10 rounded-2xl hover:bg-cyan-400/5 transition-all group magnetic-card shimmer animate-reveal">
-            <span class="material-symbols-outlined text-cyan-400 text-4xl mb-6 group-hover:animate-pulse">psychology</span>
-            <h4 class="text-white font-bold text-lg mb-3 font-[Outfit]">RAG Architecture</h4>
-            <p class="text-zinc-300 text-sm font-light tracking-wide">Vector-DBs, Embeddings & Context Eng.</p>
-          </div>
-        </div>
 
-        <!-- Dedicated Tools Segment (Enlarged) -->
-        <div class="mt-16 pt-12 border-t border-white/5">
-          <h3 class="font-mono text-[12px] uppercase tracking-[0.4em] text-zinc-500 mb-10 text-center">Mastered_Tools_&_Environment</h3>
-          <div class="flex flex-wrap justify-center gap-6">
-            <div class="px-8 py-4 bg-zinc-900 border border-white/10 rounded-2xl flex items-center gap-4 hover:border-cyan-400/50 transition-all group cursor-pointer shadow-lg hover:shadow-cyan-400/10">
-              <span class="material-symbols-outlined text-cyan-400 text-xl group-hover:rotate-12 transition-transform">terminal</span>
-              <span class="text-white text-sm font-bold font-mono">Claude Code</span>
+          <!-- AI Agents -->
+          <div class="p-6 bg-zinc-900/50 border border-white/10 rounded-2xl hover:border-purple-400/50 transition-all duration-500 group magnetic-card animate-reveal stagger-2">
+            <div class="flex items-center gap-4 pb-4 mb-4 border-b border-white/10">
+              <span class="material-symbols-outlined text-purple-400 text-2xl">hub</span>
+              <h3 class="text-white font-[Outfit] text-lg font-bold">AI Agents</h3>
             </div>
-            <div class="px-8 py-4 bg-zinc-900 border border-white/10 rounded-2xl flex items-center gap-4 hover:border-purple-400/50 transition-all group cursor-pointer shadow-lg hover:shadow-purple-400/10">
-              <span class="material-symbols-outlined text-purple-400 text-xl group-hover:scale-110 transition-transform">auto_awesome</span>
-              <span class="text-white text-sm font-bold font-mono">Antigravity</span>
+            <ul class="space-y-1.5 text-zinc-300 text-sm font-medium">
+              <li>OpenAI Agent SDK</li>
+              <li>Multi-Agent Orchestration</li>
+              <li>Chatbot Development</li>
+              <li>MCP Servers</li>
+              <li>RAG Systems</li>
+              <li>CRM</li>
+            </ul>
+          </div>
+
+          <!-- Automation -->
+          <div class="p-6 bg-zinc-900/50 border border-white/10 rounded-2xl hover:border-orange-400/50 transition-all duration-500 group magnetic-card animate-reveal stagger-3">
+            <div class="flex items-center gap-4 pb-4 mb-4 border-b border-white/10">
+              <span class="material-symbols-outlined text-orange-400 text-2xl">settings_input_component</span>
+              <h3 class="text-white font-[Outfit] text-lg font-bold">Automation</h3>
             </div>
-            <div class="px-8 py-4 bg-zinc-900 border border-white/10 rounded-2xl flex items-center gap-4 hover:border-blue-400/50 transition-all group cursor-pointer shadow-lg hover:shadow-blue-400/10">
-               <span class="material-symbols-outlined text-blue-400 text-xl">bolt</span>
-              <span class="text-white text-sm font-bold font-mono">FastAPI</span>
+            <ul class="space-y-1.5 text-zinc-300 text-sm font-medium">
+              <li>n8n Workflows</li>
+              <li>API Integrations</li>
+              <li>Webhooks</li>
+              <li>CI/CD Pipelines</li>
+            </ul>
+          </div>
+
+          <!-- Backend & Database -->
+          <div class="p-6 bg-zinc-900/50 border border-white/10 rounded-2xl hover:border-blue-400/50 transition-all duration-500 group magnetic-card animate-reveal stagger-4">
+            <div class="flex items-center gap-4 pb-4 mb-4 border-b border-white/10">
+              <span class="material-symbols-outlined text-blue-400 text-2xl">terminal</span>
+              <h3 class="text-white font-[Outfit] text-lg font-bold">Backend & DB</h3>
             </div>
-            <div class="px-8 py-4 bg-zinc-900 border border-white/10 rounded-2xl flex items-center gap-4 hover:border-orange-400/50 transition-all group cursor-pointer shadow-lg hover:shadow-orange-400/10">
-              <span class="material-symbols-outlined text-orange-400 text-xl">api</span>
-              <span class="text-white text-sm font-bold font-mono">Postman</span>
+            <ul class="space-y-1.5 text-zinc-300 text-sm font-medium">
+              <li>Python / FastAPI</li>
+              <li>PostgreSQL / Neon DB</li>
+              <li>Vector DBs (qdrant cloud)</li>
+              <li>Pydantic / REST API</li>
+            </ul>
+          </div>
+
+          <!-- Frontend -->
+          <div class="p-6 bg-zinc-900/50 border border-white/10 rounded-2xl hover:border-cyan-400/50 transition-all duration-500 group magnetic-card animate-reveal stagger-1">
+            <div class="flex items-center gap-4 pb-4 mb-4 border-b border-white/10">
+              <span class="material-symbols-outlined text-cyan-400 text-2xl">web</span>
+              <h3 class="text-white font-[Outfit] text-lg font-bold">Frontend</h3>
             </div>
-            <div class="px-8 py-4 bg-zinc-900 border border-white/10 rounded-2xl flex items-center gap-4 hover:border-white/50 transition-all group cursor-pointer shadow-lg hover:shadow-white/10">
-              <span class="material-symbols-outlined text-white text-xl">account_tree</span>
-              <span class="text-white text-sm font-bold font-mono">GitHub</span>
-            </div>
-            <div class="px-8 py-4 bg-zinc-900 border border-white/10 rounded-2xl flex items-center gap-4 hover:border-cyan-400/50 transition-all group cursor-pointer shadow-lg hover:shadow-cyan-400/10">
-              <span class="material-symbols-outlined text-cyan-400 text-xl">dock</span>
-              <span class="text-white text-sm font-bold font-mono">Docker</span>
-            </div>
+            <ul class="space-y-1.5 text-zinc-300 text-sm font-medium">
+              <li>Next.js / TypeScript</li>
+              <li>HTML5 / CSS</li>
+              <li>Landing Page Design</li>
+              <li>Tailwind CSS</li>
+            </ul>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="projects py-32 relative overflow-hidden" id="projects">
+    <section class="projects pt-16 pb-8 relative overflow-hidden" id="projects">
       <div class="absolute -top-10 right-0 opacity-10 pointer-events-none font-mono text-[8px] text-cyan-500 uppercase tracking-[0.5em]">
         ACCESSING_REPOSITORY..._SUCCESS
       </div>
-      <h2 class="section-title">Projects</h2>
-      <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+      <h2 class="section-title">Projects with Live Demos</h2>
+      <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         <!-- Mission 1 -->
-        <div class="group relative bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:border-cyan-400/50 transition-all duration-500">
+        <div class="group relative bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:border-cyan-400/50 transition-all duration-500 magnetic-card">
           <div class="aspect-video overflow-hidden">
-            <img src="https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&q=80&w=800" alt="Robot Book" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+            <img src="/book.PNG" alt="Robot Book" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
           </div>
           <div class="p-8 space-y-4">
-            <div class="flex flex-wrap gap-2">
-              <span class="font-mono text-[10px] px-2 py-0.5 rounded bg-cyan-400/10 text-cyan-400 border border-cyan-400/20">RAG_SYSTEM</span>
-              <span class="font-mono text-[10px] px-2 py-0.5 rounded bg-purple-400/10 text-purple-400 border border-purple-400/20">CHABOT_INTEL</span>
-            </div>
-            <h3 class="font-[Outfit] text-2xl font-bold text-white">Robot Book with RAG Chatbot</h3>
-            <p class="text-zinc-400 text-sm leading-relaxed">
-              A comprehensive book system powered by a Retrieval-Augmented Generation agent for interactive learning.
-            </p>
+            <h3 class="font-[Outfit] text-2xl font-bold text-white">Physical AI & Humanoid Robots Textbook</h3>
             <div class="pt-4 border-t border-white/5 flex flex-wrap justify-between items-center gap-4">
               <div class="flex items-center gap-4">
+                <a href="/robot-book-details.html" class="text-purple-400 text-xs font-bold uppercase tracking-widest hover:text-white transition-colors flex items-center gap-1">
+                  <span class="material-symbols-outlined text-sm">info</span> View Details
+                </a>
                 <a href="https://uroojfatima18.github.io/robot-book/" target="_blank" class="text-cyan-400 text-xs font-bold uppercase tracking-widest hover:text-white transition-colors flex items-center gap-1">
                   <span class="material-symbols-outlined text-sm">public</span> Live Site
                 </a>
-                <a href="/bandicam%202026-04-10%2023-46-52-305.mp4" target="_blank" class="text-purple-400 text-xs font-bold uppercase tracking-widest hover:text-white transition-colors flex items-center gap-1">
-                  <span class="material-symbols-outlined text-sm">play_circle</span> Watch Demo
+                <a href="/robot-book%20add.mp4" target="_blank" class="text-white/80 text-xs font-bold uppercase tracking-widest hover:text-white transition-colors flex items-center gap-1">
+                  <span class="material-symbols-outlined text-sm">play_circle</span> Demo
                 </a>
               </div>
-              <span class="font-mono text-[10px] text-zinc-600">ID: MISSION_01</span>
+              <span class="font-mono text-[10px] text-zinc-600">PROJECT_ID: 01</span>
             </div>
           </div>
         </div>
 
-
-
-        <!-- Mission 3 -->
-        <div class="group relative bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:border-cyan-400/50 transition-all duration-500">
+        <!-- Project 03 -->
+        <div class="group relative bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:border-cyan-400/50 transition-all duration-500 magnetic-card">
+          <div class="aspect-video overflow-hidden">
+            <img src="/taskly.PNG" alt="Taskly" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+          </div>
+          <div class="p-8 space-y-4">
+            <h3 class="font-[Outfit] text-2xl font-bold text-white">Taskly - Todo App with Integrated Chatbot</h3>
+            <div class="pt-4 border-t border-white/5 flex flex-wrap justify-between items-center gap-4">
+              <div class="flex items-center gap-4">
+                <a href="/taskly-details.html" class="text-cyan-400 text-xs font-bold uppercase tracking-widest hover:text-white transition-colors flex items-center gap-1">
+                  <span class="material-symbols-outlined text-sm">info</span> View Details
+                </a>
+                <a href="/bandicam%202026-04-11%2000-07-16-385.mp4" target="_blank" class="text-purple-400 text-xs font-bold uppercase tracking-widest hover:text-white transition-colors flex items-center gap-1">
+                  <span class="material-symbols-outlined text-sm">play_circle</span> Watch Demo
+                </a>
+              </div>
+              <span class="font-mono text-[10px] text-zinc-600">PROJECT_ID: 03</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Project 04 (Multi-Agent System) -->
+        <div class="group relative bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:border-orange-400/50 transition-all duration-500 magnetic-card">
           <div class="aspect-video relative bg-black overflow-hidden">
-            <video src="/mission1_demo.mp4" autoplay muted loop playsinline class="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700"></video>
+            <video src="/WhatsApp%20Video%202026-02-17%20at%2011.29.46%20PM.mp4" autoplay muted loop playsinline class="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700"></video>
             <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
                <span class="material-symbols-outlined text-white text-5xl">play_circle</span>
             </div>
           </div>
           <div class="p-8 space-y-4">
-            <div class="flex flex-wrap gap-2">
-              <span class="font-mono text-[10px] px-2 py-0.5 rounded bg-cyan-400/10 text-cyan-400 border border-cyan-400/20">TODO_APP</span>
-              <span class="font-mono text-[10px] px-2 py-0.5 rounded bg-purple-400/10 text-purple-400 border border-purple-400/20">AI_AGENT</span>
-            </div>
-            <h3 class="font-[Outfit] text-2xl font-bold text-white">Taskly - Todo App with Integrated Chatbot</h3>
-            <p class="text-zinc-400 text-sm leading-relaxed">
-              Taskly managing your daily tasks. You can edit by yourself or let AI Agents do it. It can add, edit, update, delete for free.
+            <h3 class="font-[Outfit] text-2xl font-bold text-white">Multi-Agent System</h3>
+            <p class="text-zinc-500 font-mono text-[10px] uppercase tracking-widest">
+              Planner → Researcher → Writer → Editor pipeline
             </p>
-            <div class="pt-4 border-t border-white/5 flex justify-between items-center">
-              <a href="/bandicam%202026-04-11%2000-07-16-385.mp4" target="_blank" class="text-purple-400 text-xs font-bold uppercase tracking-widest hover:text-white transition-colors flex items-center gap-1">
-                <span class="material-symbols-outlined text-sm">play_circle</span> Watch Demo
-              </a>
-              <span class="font-mono text-[10px] text-zinc-600">ID: MISSION_03</span>
+            <div class="pt-4 border-t border-white/5 flex flex-wrap justify-between items-center gap-4">
+              <div class="flex items-center gap-4">
+                <a href="/multi-agent-details.html" class="text-orange-400 text-xs font-bold uppercase tracking-widest hover:text-white transition-colors flex items-center gap-1">
+                  <span class="material-symbols-outlined text-sm">info</span> View Details
+                </a>
+                <a href="/WhatsApp%20Video%202026-02-17%20at%2011.29.46%20PM.mp4" target="_blank" class="text-purple-400 text-xs font-bold uppercase tracking-widest hover:text-white transition-colors flex items-center gap-1">
+                  <span class="material-symbols-outlined text-sm">play_circle</span> Watch Demo
+                </a>
+              </div>
+              <span class="font-mono text-[10px] text-zinc-600">PROJECT_ID: 04</span>
             </div>
           </div>
         </div>
 
+        <!-- Project 06 -->
+        <div class="group relative bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:border-cyan-400/50 transition-all duration-500 magnetic-card">
+          <div class="aspect-video relative bg-black overflow-hidden">
+            <video src="/WhatsApp%20Video%202026-02-19%20at%204.52.24%20PM.mp4" autoplay muted loop playsinline class="w-full h-full object-cover opacity-60 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700"></video>
+            <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none">
+               <span class="material-symbols-outlined text-white text-5xl">play_circle</span>
+            </div>
+          </div>
+          <div class="p-8 space-y-4">
+            <h3 class="font-[Outfit] text-2xl font-bold text-white">Customer Support Voice Agent</h3>
+            <p class="text-zinc-500 font-mono text-[10px] uppercase tracking-widest leading-relaxed">
+              Retell AI (Voice) → n8n (Logic) → Twilio (WhatsApp)
+            </p>
+            <div class="pt-4 border-t border-white/5 flex flex-wrap justify-between items-center gap-4">
+              <div class="flex items-center gap-4">
+                <a href="/voice-agent-details.html" class="text-purple-400 text-xs font-bold uppercase tracking-widest hover:text-white transition-colors flex items-center gap-1">
+                  <span class="material-symbols-outlined text-sm">info</span> View Details
+                </a>
+                <a href="/WhatsApp%20Video%202026-02-19%20at%204.52.24%20PM.mp4" target="_blank" class="text-white/80 text-xs font-bold uppercase tracking-widest hover:text-white transition-colors flex items-center gap-1">
+                  <span class="material-symbols-outlined text-sm">play_circle</span> Watch Demo
+                </a>
+              </div>
+              <span class="font-mono text-[10px] text-zinc-600">PROJECT_ID: 06</span>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
 
-    <section class="education-section py-20 bg-white/[0.01]" id="education">
+    <section class="education-section pt-8 pb-16 bg-white/[0.01]" id="education">
       <div class="max-w-7xl mx-auto px-6">
         <h2 class="section-title">Education & Courses</h2>
         <div class="space-y-12">
-          <!-- Formal Education -->
+          <!-- BSCS Education -->
           <div class="bg-white/5 p-8 rounded-2xl border border-white/10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div class="flex items-center gap-6">
               <div class="w-16 h-16 rounded-xl bg-cyan-400/10 flex items-center justify-center border border-cyan-400/20">
@@ -424,80 +517,32 @@
                 <p class="text-zinc-500 text-sm">Virtual University of Pakistan | 2025 - Present</p>
               </div>
             </div>
-            <span class="px-4 py-1 rounded-full bg-cyan-400/10 text-cyan-400 text-[10px] font-mono border border-cyan-400/20 uppercase tracking-widest">In_Progress</span>
+            <span class="px-4 py-1 rounded-full bg-cyan-400/10 text-cyan-400 text-[10px] font-mono border border-cyan-400/20 uppercase tracking-widest">Ongoing</span>
           </div>
 
-          <!-- Professional Courses Grid -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="bg-zinc-900 p-6 rounded-xl border border-white/5 hover:border-purple-400/30 transition-all">
-              <h4 class="text-purple-400 font-mono text-xs uppercase mb-2">Specialization // 01</h4>
-              <h3 class="text-white font-bold mb-4">Agentic AI Architecture</h3>
-              <p class="text-zinc-500 text-xs">PIAIC - Mastering multi-agent loops and OpenAI SDK.</p>
+          <!-- PIAIC Certification Program -->
+          <div class="bg-white/5 p-8 rounded-2xl border border-white/10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <div class="flex items-center gap-6">
+              <div class="w-16 h-16 rounded-xl bg-purple-400/10 flex items-center justify-center border border-purple-400/20">
+                 <span class="material-symbols-outlined text-purple-400 text-3xl">engineering</span>
+              </div>
+              <div>
+                <h3 class="text-white font-[Outfit] text-2xl font-bold">PIAIC</h3>
+                <p class="text-zinc-500 text-sm">Agentic AI & AI employee | 2024 - 2026</p>
+                <div class="flex flex-wrap gap-2 mt-3">
+                   <span class="px-2 py-0.5 bg-white/5 border border-white/10 rounded text-[9px] font-mono text-zinc-400">Agentic AI Completed</span>
+                   <span class="px-2 py-0.5 bg-white/5 border border-white/10 rounded text-[9px] font-mono text-zinc-400">Prompt & Context Engineering Completed</span>
+                   <span class="px-2 py-0.5 bg-white/5 border border-white/10 rounded text-[9px] font-mono text-zinc-400">n8n Completed</span>
+                </div>
+              </div>
             </div>
-            <div class="bg-zinc-900 p-6 rounded-xl border border-white/5 hover:border-cyan-400/30 transition-all">
-              <h4 class="text-cyan-400 font-mono text-xs uppercase mb-2">Specialization // 02</h4>
-              <h3 class="text-white font-bold mb-4">n8n Automation</h3>
-              <p class="text-zinc-500 text-xs">Complex enterprise workflow automation and logic.</p>
-            </div>
-            <div class="bg-zinc-900 p-6 rounded-xl border border-white/5 hover:border-cyan-400/30 transition-all">
-              <h4 class="text-cyan-400 font-mono text-xs uppercase mb-2">Specialization // 03</h4>
-              <h3 class="text-white font-bold mb-4">Prompt Engineering</h3>
-              <p class="text-zinc-500 text-xs">Advanced context optimization and behavioral steering.</p>
-            </div>
+            <span class="px-4 py-1 rounded-full bg-purple-400/10 text-purple-400 text-[10px] font-mono border border-purple-400/20 uppercase tracking-widest">In_Sync</span>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="automation py-32" id="automation">
-      <div class="max-w-7xl mx-auto px-6">
-        <h2 class="section-title">Live Demos </h2>
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <!-- Feed 1 -->
-          <a href="/cursorful-video-1761574326314_eIjcRREz.mp4" target="_blank" class="group bg-zinc-900/50 rounded-2xl border border-white/5 overflow-hidden hover:border-cyan-400/30 transition-all cursor-pointer">
-            <div class="aspect-video relative bg-black">
-              <video src="/cursorful-video-1761574326314_eIjcRREz.mp4" autoplay muted loop playsinline class="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity"></video>
-              <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                 <span class="material-symbols-outlined text-white text-5xl">play_circle</span>
-              </div>
-              <div class="absolute top-4 left-4 bg-black/60 backdrop-blur px-2 py-1 rounded border border-white/10 font-mono text-[8px] text-cyan-400">STREAMING_LIVE_LOG.PY</div>
-            </div>
-            <div class="p-6">
-              <h3 class="text-white font-bold font-[Outfit]">Assignment Automation</h3>
-              <p class="text-zinc-500 text-xs mt-2">Autonomous lead finder and proposal engine.</p>
-            </div>
-          </a>
-          <!-- Feed 2 -->
-          <a href="/WhatsApp%20Video%202026-02-17%20at%2011.29.46%20PM.mp4" target="_blank" class="group bg-zinc-900/50 rounded-2xl border border-white/5 overflow-hidden hover:border-cyan-400/30 transition-all cursor-pointer">
-            <div class="aspect-video relative bg-black">
-              <video src="/WhatsApp%20Video%202026-02-17%20at%2011.29.46%20PM.mp4" autoplay muted loop playsinline class="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity"></video>
-              <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                 <span class="material-symbols-outlined text-white text-5xl">play_circle</span>
-              </div>
-              <div class="absolute top-4 left-4 bg-black/60 backdrop-blur px-2 py-1 rounded border border-white/10 font-mono text-[8px] text-purple-400">NEWSLETTER_ENGINE_RUNNING</div>
-            </div>
-            <div class="p-6">
-              <h3 class="text-white font-bold font-[Outfit]">Multi-Agent Content Writer</h3>
-              <p class="text-zinc-500 text-xs mt-2">Planner → Researcher → Writer → Editor pipeline.</p>
-            </div>
-          </a>
-          <!-- Feed 3 -->
-          <a href="/WhatsApp%20Video%202026-02-19%20at%204.52.24%20PM.mp4" target="_blank" class="group bg-zinc-900/50 rounded-2xl border border-white/5 overflow-hidden hover:border-cyan-400/30 transition-all cursor-pointer">
-            <div class="aspect-video relative bg-black">
-              <video src="/WhatsApp%20Video%202026-02-19%20at%204.52.24%20PM.mp4" autoplay muted loop playsinline class="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition-opacity"></video>
-              <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                 <span class="material-symbols-outlined text-white text-5xl">play_circle</span>
-              </div>
-              <div class="absolute top-4 left-4 bg-black/60 backdrop-blur px-2 py-1 rounded border border-white/10 font-mono text-[8px] text-cyan-400">VOICE_CORE_ACTIVE</div>
-            </div>
-            <div class="p-6">
-              <h3 class="text-white font-bold font-[Outfit]">Customer Support Voice Agent</h3>
-              <p class="text-zinc-500 text-xs mt-2">24/7 Autonomous voice response system.</p>
-            </div>
-          </a>
-        </div>
-      </div>
-    </section>
+
 
     <section class="certificates py-20" id="certificates">
       <div class="max-w-7xl mx-auto px-6">
@@ -530,75 +575,58 @@
             </div>
           </a>
         </div>
-      </div>
     </section>
 
-
-
-    <footer class="py-24 border-t border-white/5 bg-black relative" id="contact">
-      <div class="absolute inset-0 bg-gradient-to-b from-cyan-400/5 to-transparent pointer-events-none"></div>
+    <footer class="py-10 border-t border-white/5 bg-[#050505] relative overflow-hidden page-gutter" id="contact">
+      <div class="absolute inset-0 bg-gradient-to-b from-cyan-500/5 via-transparent to-transparent pointer-events-none"></div>
       <div class="max-w-7xl mx-auto px-6 relative">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-16 mb-20 items-start">
-          <!-- Branding Column -->
-          <div class="space-y-6">
-            <div class="flex items-center gap-2">
-              <span class="material-symbols-outlined text-cyan-400 text-3xl">terminal</span>
-              <span class="font-[Outfit] text-2xl font-black text-cyan-400 tracking-tighter">&lt;UROOJ FATIMA/&gt;</span>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10 items-center">
+          
+          <!-- Identity Hub -->
+          <div class="space-y-4 text-left">
+            <div class="flex items-center gap-3">
+              <span class="material-symbols-outlined text-cyan-400 text-3xl">hub</span>
+              <span class="font-[Outfit] text-2xl font-black text-white tracking-tighter uppercase">UROOJ FATIMA</span>
             </div>
-            <p class="text-zinc-500 text-sm leading-relaxed max-w-xs">
-              Architecting the future of human-agent collaboration through autonomous workflows and intelligent logic.
+            <p class="text-zinc-500 text-xs leading-relaxed max-w-sm">
+              AI Agent Architect specializing in autonomous logic, RAG systems, and custom MCP solutions.
             </p>
           </div>
 
-          <!-- Socials Column -->
-          <div class="space-y-6">
-            <h4 class="font-mono text-[10px] uppercase tracking-[0.4em] text-zinc-400">Socials_Link</h4>
-            <div class="flex gap-4">
-              <a href="https://www.linkedin.com/in/urooj-fatima-b2698431a/" target="_blank" class="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:border-cyan-400/50 hover:bg-cyan-400/10 transition-all group">
-                <svg class="w-5 h-5 text-zinc-400 group-hover:text-cyan-400 transition-colors" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.761 0 5-2.239 5-5v-14c0-2.761-2.239-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
-                </svg>
+          <!-- Connection Loop (Middle to Right) -->
+          <div class="space-y-6 flex flex-col md:items-end">
+            <h4 class="font-mono text-lg md:text-xl font-bold uppercase tracking-widest text-cyan-400 underline decoration-cyan-500/30 underline-offset-8 text-left md:text-right">Connect_on_LinkedIn</h4>
+            <div class="flex flex-wrap justify-start md:justify-end gap-3">
+              <a href="https://www.linkedin.com/in/urooj-fatima-b2698431a/" target="_blank" class="px-5 py-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center gap-3 hover:border-cyan-400 hover:bg-cyan-400/10 group transition-all text-[9px] font-bold text-white uppercase tracking-widest active:scale-95">
+                <svg class="w-4 h-4 text-zinc-400 group-hover:text-cyan-400 transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.761 0 5-2.239 5-5v-14c0-2.761-2.239-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                LinkedIn
               </a>
-              <a href="https://github.com/uroojfatima18" target="_blank" class="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:border-cyan-400/50 hover:bg-cyan-400/10 transition-all group">
-                <svg class="w-5 h-5 text-zinc-400 group-hover:text-cyan-400 transition-colors" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.042-1.416-4.042-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57c4.767-1.587 8.207-6.086 8.207-11.387 0-6.627-5.373-12-12-12"/>
-                </svg>
+              <a href="https://github.com/uroojfatima18" target="_blank" class="px-6 py-3 rounded-xl bg-white/5 border border-white/10 flex items-center gap-3 hover:border-purple-400 hover:bg-purple-400/10 transition-all text-[10px] font-bold text-white uppercase tracking-widest active:scale-95">
+                <svg class="w-4 h-4 text-zinc-400 group-hover:text-purple-400 transition-colors" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.042-1.416-4.042-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57c4.767-1.587 8.207-6.086 8.207-11.387 0-6.627-5.373-12-12-12"/></svg>
+                GitHub
               </a>
-              <a href="mailto:uroojf199@gmail.com" class="w-12 h-12 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:border-cyan-400/50 hover:bg-cyan-400/10 transition-all group">
-                <span class="material-symbols-outlined text-zinc-400 group-hover:text-cyan-400 transition-colors">mail</span>
+              <a href="mailto:uroojf199@gmail.com" class="px-6 py-3 rounded-xl bg-white/5 border border-white/10 flex items-center gap-3 hover:border-cyan-400 hover:bg-cyan-400/10 transition-all text-[10px] font-bold text-white uppercase tracking-widest active:scale-95">
+                <span class="material-symbols-outlined text-zinc-400 group-hover:text-cyan-400 transition-colors text-lg">mail</span>
+                Email
               </a>
-            </div>
-          </div>
-
-          <!-- Status Column -->
-          <div class="space-y-6">
-            <h4 class="font-mono text-[10px] uppercase tracking-[0.4em] text-zinc-400">Get In Touch </h4>
-            <div class="space-y-3">
-              <div class="flex justify-between items-center bg-white/[0.03] px-4 py-2 rounded-lg border border-white/5">
-                <span class="text-[10px] text-zinc-500 uppercase">System Uptime</span>
-                <span class="text-[10px] text-cyan-400 font-bold">99.98%</span>
-              </div>
-              <div class="flex justify-between items-center bg-white/[0.03] px-4 py-2 rounded-lg border border-white/5">
-                <span class="text-[10px] text-zinc-500 uppercase">Availability</span>
-                <span class="text-[10px] text-purple-400 font-bold">Ready_For_Hire</span>
-              </div>
             </div>
           </div>
         </div>
 
-        <div class="pt-12 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
-          <p class="font-mono text-[10px] text-zinc-600 uppercase tracking-[0.3em]"></p>
-          <div class="flex items-center gap-4">
-            <div class="flex items-center gap-2">
-              <div class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_8px_rgba(34,211,238,0.6)]"></div>
-              <span class="font-mono text-[9px] text-zinc-500 uppercase tracking-widest"></span>
-            </div>
+        <div class="pt-10 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
+          <div class="flex items-center gap-3">
+             <div class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse shadow-[0_0_8px_#22d3ee]"></div>
+             <p class="font-mono text-[9px] text-zinc-600 uppercase tracking-widest">
+               &copy; 2024 UROOJ FATIMA — AI AGENT ARCHITECT
+             </p>
           </div>
+          <p class="font-mono text-[8px] text-zinc-700 uppercase tracking-widest bg-white/5 px-4 py-1 rounded-full border border-white/10">
+            LAST_SYNC: 04.21.2024_22:44
+          </p>
         </div>
       </div>
     </footer>
   </div>
   <script type="module" src="/src/main.js"></script>
 </body>
-
 </html>

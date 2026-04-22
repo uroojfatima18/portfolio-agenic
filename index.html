@@ -13,13 +13,31 @@
     .plasma-glow { box-shadow: 0 0 50px -10px rgba(34, 211, 238, 0.2); }
     .glass-panel { background: rgba(19, 19, 19, 0.7); backdrop-filter: blur(20px); }
     body { background-color: #050505; color: #e5e2e1; }
-    .section-title { font-family: 'Outfit', sans-serif; font-size: clamp(2rem, 8vw, 3.5rem); font-weight: 900; color: #22d3ee; margin-bottom: 2rem; text-align: center; line-height: 1.1; }
+    .section-title { font-family: 'Outfit', sans-serif; font-size: clamp(2rem, 8vw, 3.5rem); font-weight: 900; color: #22d3ee; margin-bottom: 4rem; text-align: center; line-height: 1.1; }
+    
+    /* Standardized Spacing & Layout System */
+    .section-container { max-width: 90rem; margin-left: auto; margin-right: auto; padding-left: 5rem; padding-right: 5rem; width: 100%; }
+    .section-padding { padding-top: 6rem; padding-bottom: 6rem; scroll-margin-top: 100px; }
+    #home.section-padding { padding-top: 10rem; padding-bottom: 10rem; min-height: 95vh; display: flex; align-items: center; scroll-margin-top: 0; }
+    @media (max-width: 1024px) { 
+      .section-container { padding-left: 2rem; padding-right: 2rem; }
+      .section-padding { padding-top: 4rem; padding-bottom: 4rem; scroll-margin-top: 80px; }
+      #home.section-padding { min-height: auto; padding-top: 4rem; }
+    }
+    
+    html { scroll-behavior: smooth; }
+    
+    /* Premium Nav Hover */
+    .nav-link { position: relative; transition: color 0.3s ease; }
+    .nav-link::after { content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 2px; background: #22d3ee; transition: width 0.3s ease; }
+    .nav-link:hover { color: #fff; }
+    .nav-link:hover::after { width: 100%; }
     
     /* Exact Original Scroll Indicator Styles */
     /* Full-Page Scroll Progress Tracker */
     .scroll-indicator {
       position: fixed;
-      left: 0.25rem;
+      left: 1rem;
       top: 1rem;
       bottom: 1rem;
       width: 1px;
@@ -27,7 +45,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
-      opacity: 0.4;
+      opacity: 0.25;
     }
     .indicator-line-bg {
       position: absolute;
@@ -62,7 +80,7 @@
       z-index: 11;
       transition: top 0.1s cubic-bezier(0.23, 1, 0.32, 1);
     }
-    @media (max-width: 1024px) {
+    @media (max-width: 1200px) {
       .scroll-indicator { display: none; }
     }
     @keyframes scan {
@@ -83,10 +101,13 @@
     .stagger-3 { transition-delay: 0.3s; }
     .stagger-4 { transition-delay: 0.4s; }
 
+
+
+121: 
     /* Magnetic Hover for Cards */
     .magnetic-card { transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.6s ease, border-color 0.6s ease; }
     .magnetic-card:hover { transform: translateY(-12px) scale(1.02); border-color: var(--accent); box-shadow: 0 20px 40px -10px var(--glow); }
-
+125: 
     /* Shimmer Effect for Glass */
     .shimmer { position: relative; overflow: hidden; }
     .shimmer::after {
@@ -95,7 +116,7 @@
       transform: rotate(45deg); animation: shimmer 6s infinite;
     }
     @keyframes shimmer { 0% { transform: translateX(-100%) rotate(45deg); } 100% { transform: translateX(100%) rotate(45deg); } }
-
+134: 
     /* Blinking Pulse */
     .pulse-dot { width: 8px; height: 8px; background: #22d3ee; border-radius: 50%; position: relative; }
     .pulse-dot::after {
@@ -103,11 +124,11 @@
       border: 2px solid #22d3ee; animation: pulse-ring 2s infinite;
     }
     @keyframes pulse-ring { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(2.5); opacity: 0; } }
-
+142: 
     /* Animated Gradient Text */
     @keyframes gradient-flow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
     .animate-text-flow { background-size: 200% auto; animation: gradient-flow 4s linear infinite; }
-
+146: 
     /* Custom Cursor Styles */
     #cursor-dot, #cursor-ring { transform: translate(-50%, -50%); opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
     body:hover #cursor-dot, body:hover #cursor-ring { opacity: 1; }
@@ -120,10 +141,7 @@
     .profile-tilt:hover {
       filter: brightness(1.1) grayscale(0);
     }
-    
-    @media (min-width: 1024px) {
-      .page-gutter { padding-left: 4rem; }
-    }
+
   </style>
   <script>
     document.addEventListener('DOMContentLoaded', () => {
@@ -234,15 +252,15 @@
     </div>
 
     <!-- Premium Navigation -->
-    <header class="sticky top-6 z-50 flex justify-between items-center px-8 py-3 w-full bg-black/80 backdrop-blur-xl rounded-full max-w-5xl mx-auto border border-white/10 shadow-[0_0_40px_-10px_rgba(34,211,238,0.15)]">
+    <header class="sticky top-6 z-50 flex justify-between items-center px-10 py-3 w-[95%] bg-black/80 backdrop-blur-xl rounded-full max-w-[90rem] mx-auto border border-white/10 shadow-[0_0_40px_-10px_rgba(34,211,238,0.15)]">
       <div class="flex items-center gap-3">
         <span class="material-symbols-outlined text-cyan-400">terminal</span>
         <span class="font-[Outfit] text-xl font-black text-white tracking-tighter">&lt;UROOJ/&gt;</span>
       </div>
       <nav class="hidden md:flex items-center gap-8">
-        <a class="text-cyan-400 font-bold border-b-2 border-cyan-400/50 pb-1 font-[Space_Grotesk]" href="#home">Home</a>
-        <a class="text-zinc-400 font-medium hover:text-white transition-all duration-300 font-[Space_Grotesk]" href="#about">About</a>
-        <a class="text-zinc-400 font-medium hover:text-white transition-all duration-300 font-[Space_Grotesk]" href="#projects">Projects</a>
+        <a class="nav-link text-cyan-400 font-bold border-b-2 border-cyan-400/50 pb-1 font-[Space_Grotesk]" href="#home">Home</a>
+        <a class="nav-link text-zinc-400 font-medium hover:text-white transition-all duration-300 font-[Space_Grotesk]" href="#about">About</a>
+        <a class="nav-link text-zinc-400 font-medium hover:text-white transition-all duration-300 font-[Space_Grotesk]" href="#projects">Projects</a>
       </nav>
       <a href="https://mail.google.com/mail/?view=cm&fs=1&to=uroojf199@gmail.com" target="_blank" class="bg-cyan-400 text-black px-6 py-2 rounded-xl font-[Outfit] font-bold text-sm active:scale-95 transition-transform hover:shadow-[0_0_15px_rgba(34,211,238,0.4)]">
         Start Project Today
@@ -250,23 +268,23 @@
     </header>
 
     <!-- New Profile Hero Section -->
-    <main class="relative pt-10 pb-2 overflow-hidden page-gutter" id="home">
-      <div class="max-w-7xl mx-auto px-6">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-          <div class="space-y-4 animate-fade-in order-2 lg:order-1">
+    <main class="relative section-padding overflow-hidden" id="home">
+      <div class="section-container lg:pl-32">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div class="space-y-6 animate-fade-in order-2 lg:order-1">
             <!-- New Prominent Main Tag -->
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-xl bg-white/5 border border-cyan-400/30 shadow-[0_5px_15px_rgba(34,211,238,0.1)] mb-0">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-xl bg-white/5 border border-cyan-400/30 shadow-[0_5px_15px_rgba(34,211,238,0.1)] mb-2">
               <div class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></div>
               <span class="font-[Outfit] text-[10px] uppercase tracking-[0.3em] font-black text-cyan-400">Agentic AI Developer</span>
             </div>
             
-            <h1 class="text-6xl md:text-8xl font-[Outfit] font-black text-white leading-[0.8] tracking-tighter">
+            <h1 class="text-6xl md:text-8xl font-[Outfit] font-black text-white leading-[1] tracking-tighter">
               I build <br>
-              <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500">Autonomous</span><br>
+              <span class="inline-block text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500 pr-4">Autonomous</span><br>
               Systems
             </h1>
             
-            <div class="bg-white/5 p-5 rounded-2xl border border-white/10 space-y-4 backdrop-blur-xl">
+            <div class="bg-white/5 p-6 rounded-2xl border border-white/10 space-y-4 backdrop-blur-xl">
               <div class="space-y-3">
                 <h2 class="text-white font-bold text-2xl font-[Outfit]">Hi I'm Urooj Fatima</h2>
                 <p class="text-zinc-300 text-sm font-light leading-relaxed">
@@ -304,20 +322,21 @@
           <div class="relative group order-1 lg:order-2 animate-reveal max-w-sm mx-auto">
             <div class="absolute -inset-1 bg-gradient-to-tr from-cyan-400 to-purple-500 rounded-[2.5rem] blur-xl opacity-20 group-hover:opacity-40 transition duration-1000"></div>
             <div class="relative aspect-square rounded-[2rem] overflow-hidden border border-white/10 bg-zinc-900 group-hover:border-cyan-400/50 transition-all duration-700 shimmer profile-tilt">
-              <img src="/uroojfatima.png" alt="Urooj Fatima" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 scale-105 group-hover:scale-100 italic">
+              <img src="/uroojfatima.png" alt="Urooj Fatima" loading="lazy" class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 scale-100 group-hover:scale-110 italic">
               <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60"></div>
             </div>
           </div>
         </div>
+
       </div>
     </main>
 
     <!-- Technical Proficiency Section -->
-    <section class="skills py-24 bg-white/[0.02]" id="skills">
-      <div class="max-w-7xl mx-auto px-6">
+    <section class="skills section-padding bg-white/[0.02]" id="skills">
+      <div class="section-container">
         <h2 class="section-title">Tech Stack</h2>
         
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
           <!-- AI & Tools -->
           <div class="p-6 bg-zinc-900/50 border border-white/10 rounded-2xl hover:border-cyan-400/50 transition-all duration-500 group magnetic-card animate-reveal stagger-1">
             <div class="flex items-center gap-4 pb-4 mb-4 border-b border-white/10">
@@ -391,20 +410,33 @@
               <li>Tailwind CSS</li>
             </ul>
           </div>
+
+          <!-- Deployment -->
+          <div class="p-6 bg-zinc-900/50 border border-white/10 rounded-2xl hover:border-green-400/50 transition-all duration-500 group magnetic-card animate-reveal stagger-2">
+            <div class="flex items-center gap-4 pb-4 mb-4 border-b border-white/10">
+              <span class="material-symbols-outlined text-green-400 text-2xl">cloud_upload</span>
+              <h3 class="text-white font-[Outfit] text-lg font-bold">Deployment</h3>
+            </div>
+            <ul class="space-y-1.5 text-zinc-300 text-sm font-medium">
+              <li>Vercel</li>
+              <li>Hugging Face</li>
+            </ul>
+          </div>
         </div>
       </div>
     </section>
 
-    <section class="projects pt-16 pb-8 relative overflow-hidden" id="projects">
-      <div class="absolute -top-10 right-0 opacity-10 pointer-events-none font-mono text-[8px] text-cyan-500 uppercase tracking-[0.5em]">
-        ACCESSING_REPOSITORY..._SUCCESS
-      </div>
-      <h2 class="section-title">Projects with Live Demos</h2>
-      <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <section class="projects section-padding relative overflow-hidden" id="projects">
+      <div class="section-container">
+        <div class="absolute -top-10 right-0 opacity-10 pointer-events-none font-mono text-[8px] text-cyan-500 uppercase tracking-[0.5em]">
+          ACCESSING_REPOSITORY..._SUCCESS
+        </div>
+        <h2 class="section-title">Projects with Live Demos</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         <!-- Mission 1 -->
         <div class="group relative bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:border-cyan-400/50 transition-all duration-500 magnetic-card">
           <div class="aspect-video overflow-hidden">
-            <img src="/book.PNG" alt="Robot Book" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+            <img src="/book.PNG" alt="Robot Book" loading="lazy" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
           </div>
           <div class="p-8 space-y-4">
             <h3 class="font-[Outfit] text-2xl font-bold text-white">Physical AI & Humanoid Robots Textbook</h3>
@@ -428,7 +460,7 @@
         <!-- Project 03 -->
         <div class="group relative bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:border-cyan-400/50 transition-all duration-500 magnetic-card">
           <div class="aspect-video overflow-hidden">
-            <img src="/taskly.PNG" alt="Taskly" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+            <img src="/taskly.PNG" alt="Taskly" loading="lazy" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
           </div>
           <div class="p-8 space-y-4">
             <h3 class="font-[Outfit] text-2xl font-bold text-white">Taskly - Todo App with Integrated Chatbot</h3>
@@ -502,10 +534,10 @@
       </div>
     </section>
 
-    <section class="education-section pt-8 pb-16 bg-white/[0.01]" id="education">
-      <div class="max-w-7xl mx-auto px-6">
+    <section class="education-section section-padding bg-white/[0.01]" id="education">
+      <div class="section-container">
         <h2 class="section-title">Education & Courses</h2>
-        <div class="space-y-12">
+        <div class="space-y-8">
           <!-- BSCS Education -->
           <div class="bg-white/5 p-8 rounded-2xl border border-white/10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
             <div class="flex items-center gap-6">
@@ -544,10 +576,10 @@
 
 
 
-    <section class="certificates py-20" id="certificates">
-      <div class="max-w-7xl mx-auto px-6">
+    <section class="certificates section-padding" id="certificates">
+      <div class="section-container">
         <h2 class="section-title">Verified Credentials</h2>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
           <!-- Cert 1 -->
           <a href="/prompt%20eng%20certificate%20by%20PIAIC.PNG" target="_blank" class="group relative bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:border-cyan-400/50 transition-all cursor-zoom-in">
             <div class="aspect-video relative">
@@ -577,9 +609,9 @@
         </div>
     </section>
 
-    <footer class="py-10 border-t border-white/5 bg-[#050505] relative overflow-hidden page-gutter" id="contact">
+    <footer class="section-padding border-t border-white/5 bg-[#050505] relative overflow-hidden" id="contact">
       <div class="absolute inset-0 bg-gradient-to-b from-cyan-500/5 via-transparent to-transparent pointer-events-none"></div>
-      <div class="max-w-7xl mx-auto px-6 relative">
+      <div class="section-container relative">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10 items-center">
           
           <!-- Identity Hub -->

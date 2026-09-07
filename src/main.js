@@ -5,30 +5,23 @@ const morphText = document.getElementById('morph-text');
 const phrases = ["AI Agents", "AI Automation"];
 let index = 0;
 
-// Initialize text
-morphText.textContent = phrases[index];
+if (morphText) {
+  morphText.textContent = phrases[index];
 
-setInterval(() => {
-  index = (index + 1) % phrases.length;
+  setInterval(() => {
+    index = (index + 1) % phrases.length;
+    morphText.style.opacity = '0';
+    morphText.style.transform = 'translateY(20px)';
 
-  // Smooth vertical slide effect - phase 1: slide out
-  morphText.style.opacity = '0';
-  morphText.style.transform = 'translateY(20px)'; // Slide down and out
-
-  setTimeout(() => {
-    // Phase 2: change text and position for slide in
-    morphText.textContent = phrases[index];
-    morphText.style.transform = 'translateY(-20px)'; // Position above for sliding in
-
-    // Force reflow to ensure the transform change is applied before the next one
-    // This makes the transition from -20px to 0px visible
-    morphText.offsetHeight;
-
-    // Phase 3: slide in
-    morphText.style.opacity = '1';
-    morphText.style.transform = 'translateY(0)'; // Slide to original position
-  }, 400); // Time for slide out and text change
-}, 3500); // Total interval for one cycle
+    setTimeout(() => {
+      morphText.textContent = phrases[index];
+      morphText.style.transform = 'translateY(-20px)';
+      morphText.offsetHeight;
+      morphText.style.opacity = '1';
+      morphText.style.transform = 'translateY(0)';
+    }, 400);
+  }, 3500);
+}
 
 // Intersection Observer for Reveal Animations
 const observerOptions = {
